@@ -4,9 +4,11 @@ import com.freightfox.weather.dto.GeocodeResponse;
 import com.freightfox.weather.dto.OpenWeatherResponse;
 import com.freightfox.weather.dto.WeatherInfoResponse;
 import com.freightfox.weather.model.WeatherInfo;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
 public class WeatherInfoMapper {
 
     public WeatherInfo mapToWeatherInfo(OpenWeatherResponse openWeatherResponse, GeocodeResponse geocodeResponse, String pincode, LocalDate date) {
@@ -23,6 +25,7 @@ public class WeatherInfoMapper {
 
     public WeatherInfoResponse mapToWeatherInfoResponse(WeatherInfo weatherInfo) {
         WeatherInfoResponse weatherInfoResponse = new WeatherInfoResponse();
+        weatherInfoResponse.setPincode(weatherInfo.getPincode());
         weatherInfoResponse.setDate(weatherInfo.getDate());
         weatherInfoResponse.setLatitude(weatherInfo.getLatitude());
         weatherInfoResponse.setLongitude(weatherInfo.getLongitude());
