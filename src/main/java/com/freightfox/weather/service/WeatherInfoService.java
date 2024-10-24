@@ -2,6 +2,8 @@ package com.freightfox.weather.service;
 
 import com.freightfox.weather.dto.GeocodeResponse;
 import com.freightfox.weather.dto.OpenWeatherResponse;
+import com.freightfox.weather.dto.WeatherInfoResponse;
+import com.freightfox.weather.mapper.WeatherInfoMapper;
 import com.freightfox.weather.model.WeatherInfo;
 import com.freightfox.weather.repository.WeatherInfoRepository;
 import lombok.AllArgsConstructor;
@@ -17,29 +19,22 @@ public class WeatherInfoService {
     private WeatherInfoRepository weatherInfoRepo;
     private OpenWeatherService openWeatherService;
     private GeocodeService geocodeService;
+    private WeatherInfoMapper weatherInfoMapper;
 
-    public WeatherInfo fetchWeatherByPincode(String pincode, LocalDate date) {
+    public WeatherInfoResponse fetchWeatherByPincode(String pincode, LocalDate date) {
         Optional<WeatherInfo> existingWeather = weatherInfoRepo.findByPincodeAndDate(pincode, date);
         if (existingWeather.isPresent()) {
-            return existingWeather.get();
+            return weatherInfoMapper.mapToWeatherInfoResponse(existingWeather.get());
         } else {
             WeatherInfo weatherInfo = getWeatherForPincode(pincode,date);
             weatherInfoRepo.save(weatherInfo);
-            return weatherInfo;
+            return weatherInfoMapper.mapToWeatherInfoResponse(weatherInfo);
         }
     }
 
     public WeatherInfo getWeatherForPincode(String pincode, LocalDate date) {
         GeocodeResponse geocodeResponse = geocodeService.getLatLngFromPincode(pincode);
         OpenWeatherResponse openWeatherResponse = openWeatherService.getWeather(pincode,geocodeResponse.getLat(),geocodeResponse.getLon() , date);
-
-        WeatherInfo weatherInfo = new WeatherInfo();
-        weatherInfo.setPincode(pincode);
-        weatherInfo.setLatitude(geocodeResponse.getLat());
-        weatherInfo.setLongitude(geocodeResponse.getLon());
-        weatherInfo.setTemperature(openWeatherResponse.getMain().getTemp());
-        weatherInfo.setDate(date);
-        weatherInfo.setWeatherDescription(openWeatherResponse.getWeather().getFirst().getDescription());
-        return weatherInfo;
+        return weatherInfoMapper.mapToWeatherInfo(openWeatherResponse,geocodeResponse,pincode,date);
     }
 }
