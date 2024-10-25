@@ -8,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 
 @Service
-
 public class OpenWeatherService {
 
     @Value("${OPENWEATHER_API_KEY}")
